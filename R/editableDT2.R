@@ -570,6 +570,8 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
                 if("factor" %in% myclass[[i]]){
                     mylist[[i+addno]]=selectInput3(ns(myname),myname,
                                                    choices=levels(mydf[[i]]),selected=mydf[1,i],width=input$width2)
+                } else if("integer" %in% myclass[[i]]){
+                     mylist[[i+addno]]=numericInput3(inputId = ns(myname), label = myname,value = mydf[1,i], width=input$width2)
                 } else if("Date" %in% myclass[[i]]){
                     mylist[[i+addno]]=dateInput3(ns(myname),myname,value=mydf[1,i],width=input$width2)
                 } else if("logical" %in% myclass[[i]]){
