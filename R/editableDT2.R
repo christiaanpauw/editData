@@ -498,10 +498,6 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
                     if(is.na(mydf[1,i])) myvalue=FALSE
                     else myvalue=mydf[1,i]
                     updateCheckboxInput(session,myname,value=myvalue)
-                } else if ("numeric" %in% myclass[[i]]) {
-                    if (all(na.omit(as.integer(mydf[[i]])) == na.omit(mydf[[i]]))) {
-                        myclass[[i]] <- "integer"
-                    }
                 } else { # c("numeric","integer","charater")
 
                     mywidth=(((max(nchar(mydf2[[i]]),defaultlen,na.rm=TRUE)*8) %/% input$width2)+1)*input$width2
@@ -585,7 +581,8 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
                     mylist[[i+addno]]=selectInput3(ns(myname),myname,
                                                    choices=levels(mydf[[i]]),selected=mydf[1,i],width=input$width2)
                 } else if("integer" %in% myclass[[i]]){
-                    mylist[[i+addno]]=numericInput3(inputId = ns(myname), label = myname,value = mydf[1,i], width=input$width2, step = "1")
+                    mylist[[i+addno]]=integerInputUI(id = ns(myname), label = myname,value = mydf[1,i], width=input$width2, step = "1")
+                    callModule(myname, module = integerInput)
                 } else if("numeric" %in% myclass[[i]]){
                     mylist[[i+addno]]=numericInput3(inputId = ns(myname), label = myname,value = mydf[1,i], width=input$width2, step = "ANY")
                 } else if("Date" %in% myclass[[i]]){
