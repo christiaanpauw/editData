@@ -29,6 +29,10 @@ integerInputUI <- function(id, ...){
 integerInput <- function(input, output, session){
 
      x <- reactive({as.integer(gsub(pattern = "[^[\\,\\.]]", replacement = "\\1", x = input$intInput))})
+<<<<<<< HEAD
+=======
+     assign("xxx", reactiveValuesToList(input), envir = .GlobalEnv)
+>>>>>>> 5a7bb1d2a3248a84aedd50e319e0bb19d3cfabd8
 
      observeEvent(input$intInput,{
           updateNumericInput(session = session, inputId = "intInput", value = x()
@@ -43,7 +47,11 @@ integerInput <- function(input, output, session){
 
 toets_integerInput <- function(){
 
+<<<<<<< HEAD
      uii <- shiny::tagList(
+=======
+     uii <- tagList(
+>>>>>>> 5a7bb1d2a3248a84aedd50e319e0bb19d3cfabd8
           integerInputUI(id = "toetsID", label = "Heelgetal Toetsarea", value = 10),
           verbatimTextOutput("uit"),
           uiOutput("uit2")
