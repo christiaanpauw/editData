@@ -581,8 +581,7 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
                     mylist[[i+addno]]=selectInput3(ns(myname),myname,
                                                    choices=levels(mydf[[i]]),selected=mydf[1,i],width=input$width2)
                 } else if("integer" %in% myclass[[i]]){
-                    mylist[[i+addno]]=integerInputUI(id = ns(myname), label = myname,value = mydf[1,i], width=input$width2, step = "1")
-                    callModule(myname, module = integerInput)
+                     mylist[[i+addno]]=integerInput3(inputId = ns(myname), label = myname,value = mydf[1,i], width=input$width2, step = 1)
                 } else if("numeric" %in% myclass[[i]]){
                     mylist[[i+addno]]=numericInput3(inputId = ns(myname), label = myname,value = mydf[1,i], width=input$width2, step = "ANY")
                 } else if("Date" %in% myclass[[i]]){
