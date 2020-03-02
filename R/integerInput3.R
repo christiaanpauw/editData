@@ -32,3 +32,19 @@ integerInput3<-function (inputId, label, value, min=NA,max=NA,step=NA,width=100,
                     min=min,max=max,step=step,style=paste("width: ",width,"px;",sep=""),...)
      )
 }
+
+#' editableDT_toets
+#' @title editableDT_toets
+#' @export
+
+editableDT_toets <- function(){
+
+     uii <- fluidPage(editableDTUI(id = "id1"),
+                      dataTableOutput("dataout"))
+     serverr <- function(input, output, session) {
+          df <- reactive(mtcars)
+          res <- callModule(module = editableDT, id = "id1", data = df, session =session)
+          output$dataout <- renderDataTable({res()})
+     }
+     shinyApp(uii, serverr)
+}
