@@ -1,3 +1,4 @@
+
 # Module UI
 
 #' @title   integerInputUI and integerInput
@@ -67,4 +68,3 @@ toets_integerInput <- function(){
 
 ## To be copied in the server
 # callModule(integerInput, "integerInput1")
-
