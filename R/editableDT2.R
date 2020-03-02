@@ -67,7 +67,7 @@ editableDTUI <- function(id){
 #' @importFrom dplyr select
 #' @importFrom magrittr "%>%"
 #' @export
-editableDT <- function(input, output, session, dataname=reactive(""),data=reactive(NULL),inputwidth=reactive(100),mode=reactive(2)) {
+editableDT <- function(input, output, session, dataname=reactive(""), data=reactive(NULL), inputwidth=reactive(100), mode=reactive(2)) {
 
     deleted<-deleted1<-edited<-edited1<-added<-added1<-updated1<-updated<-restored<-restored1<-c()
 
@@ -99,15 +99,18 @@ editableDT <- function(input, output, session, dataname=reactive(""),data=reacti
         ns <- session$ns
         amode=mode()
         tagList(
-            actionButton(ns("delRow"),"Delete Row",icon=icon("remove",lib="glyphicon")),
-            actionButton(ns("addRow"),"Add New",icon=icon("plus",lib="glyphicon")),
-            actionButton(ns("insertRow"),"Insert Row",icon=icon("hand-up",lib="glyphicon")),
-            actionButton(ns("editData"),"Edit Data",icon=icon("wrench",lib="glyphicon")),
-            if(amode==1) actionButton(ns("newCol"),"New Col",icon=icon("plus-sign",lib="glyphicon")),
-            if(amode==1) actionButton(ns("removeCol"),"Remove Col",icon=icon("trash",lib="glyphicon")),
-            if(amode==1) actionButton(ns("dplyr"),"Manipulate",icon=icon("scissors",lib="glyphicon")),
-            if(amode==2) actionButton(ns("reset"),"Reset",icon=icon("remove-sign",lib="glyphicon")),
-            if(amode==2) actionButton(ns("restore"),"Restore",icon=icon("heart",lib="glyphicon"))
+             shinyjs::useShinyjs(),
+             if(amode %in% c(1,2,3))  actionButton(ns("delRow"),"Delete Row",icon=icon("remove",lib="glyphicon")),
+             if(amode %in% c(1,2,3)) actionButton(ns("addRow"),"Add New",icon=icon("plus",lib="glyphicon")),
+             if(amode %in% c(1,2,3)) actionButton(ns("insertRow"),"Insert Row",icon=icon("hand-up",lib="glyphicon")),
+
+             if(amode %in% c(1,2,3,4)) actionButton(ns("editData"),"Edit Data",icon=icon("wrench",lib="glyphicon")),
+
+             if(amode %in% c(1,3)) actionButton(ns("newCol"),"New Col",icon=icon("plus-sign",lib="glyphicon")),
+             if(amode %in% c(1,3)) actionButton(ns("removeCol"),"Remove Col",icon=icon("trash",lib="glyphicon")),
+             if(amode %in% c(1,3)) actionButton(ns("dplyr"),"Manipulate",icon=icon("scissors",lib="glyphicon")),
+             if(amode %in% c(2,3)) actionButton(ns("reset"),"Reset",icon=icon("remove-sign",lib="glyphicon")),
+             if(amode %in% c(2,3)) actionButton(ns("restore"),"Restore",icon=icon("heart",lib="glyphicon"))
         )
     })
 
@@ -725,7 +728,7 @@ editData=function(data=NULL,viewer="dialog",mode=2){
             mydf=eval(parse(text=input$mydata))
             mydf
         })
-        df=callModule(editableDT,"table1",data=reactive(mydf()),inputwidth=reactive(170),mode=reactive(mode))
+        df = callModule(editableDT, "table1", data=reactive(mydf()), inputwidth=reactive(170), mode=reactive(mode))
 
         # output$test=renderPrint({
         #     str(df())
