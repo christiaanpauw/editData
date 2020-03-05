@@ -67,7 +67,12 @@ editableDTUI <- function(id){
 #' @importFrom dplyr select
 #' @importFrom magrittr "%>%"
 #' @export
-editableDT <- function(input, output, session, dataname=reactive(""), data=reactive(NULL), inputwidth=reactive(100), mode=reactive(2)) {
+editableDT <- function(input, output, session,
+                       dataname=reactive(""),
+                       data=reactive(NULL),
+                       inputwidth=reactive(100),
+                       mode=reactive(2),
+                       excludeCols = c()) {
 
     deleted<-deleted1<-edited<-edited1<-added<-added1<-updated1<-updated<-restored<-restored1<-c()
 
@@ -123,13 +128,11 @@ editableDT <- function(input, output, session, dataname=reactive(""), data=react
         }
         updateCheckboxInput(session,"resetPage",value=TRUE)
         DT::datatable(
-            df(),
+            df()[setdiff(names(df()), excludeCols)],
             selection = "single",
             editable=TRUE,
             caption = NULL
         )
-
-
     })
 
     proxy = DT::dataTableProxy('origTable')
