@@ -219,7 +219,7 @@ editableDT <- function(input, output, session,
             updateTextInput(session,"result",value="restored")
         }  else {
             showModal(modalDialog(
-                title = "Retore",
+                title = "Restore",
                 "You can restore data after reset or delete row. Press 'Esc' or Press 'OK' button",
                 easyClose = TRUE,
                 footer=modalButton("OK")
@@ -449,12 +449,16 @@ editableDT <- function(input, output, session,
 
     observeEvent(input$update,{
         ids <- input$no
+        message("ids = ", ids)
+        message("dim(df()) = ", paste(dim(df()), collapse = ","))
         x<-df()
+        #assign(x = "xx", value = x, envir = .GlobalEnv)
         restored<<-x
 
         myname=colnames(x)
         status=ifelse(tibble::has_rownames(x),1,0)
         x<-as.data.frame(x)
+        message("input$rowname = ", input$rowname)
         rownames(x)[ids]=input$rowname
 
         # for(i in 1:ncol(x)){
@@ -471,10 +475,10 @@ editableDT <- function(input, output, session,
             }
         }
         if(input$result=="updated"){
-            updated1<<-x
+            updated1 <<- x
             updateTextInput(session,"result",value="updated1")
         } else{
-            updated<<-x
+            updated <<- x
             updateTextInput(session,"result",value="updated")
         }
         #updateCheckboxInput(session,"showEdit",value=FALSE)
