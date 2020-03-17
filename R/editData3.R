@@ -35,7 +35,7 @@ editData3 <- function(data = NULL, viewer = c("dialog", "browser", "pane")[1], m
 
                 observeEvent(input$file1, {
                         if (!is.null(input$file1)) {
-                                dfInput(read.csv(input$file1$datapath,stringsAsFactors = input$strAsFactor))
+                                dfInput(read.csv(input$file1$datapath, stringsAsFactors = input$strAsFactor))
                         }
                 })
 
