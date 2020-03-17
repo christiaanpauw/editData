@@ -49,6 +49,14 @@ editData3 <- function(data = NULL, viewer = c("dialog", "browser", "pane")[1], m
                                 write.csv(dfOutput(), file, row.names = FALSE)
                         }
                 )
+                observeEvent(input$done, {
+                        result <- dfOutput()
+                        stopApp(result)
+                })
+
+                observeEvent(input$cancel, {
+                        stopApp()
+                })
         }
 
         myviewer <- switch(viewer,

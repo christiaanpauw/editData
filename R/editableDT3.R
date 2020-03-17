@@ -219,6 +219,7 @@ editableDT3 <- function(input, output, session,
                 footer = tagList(
                     actionButton(inputId = ns("remove"), label = "Delete", icon = icon("remove", lib = "glyphicon")),
                     actionButton(inputId = ns("update"), label = "Update", icon = icon("ok", lib = "glyphicon")),
+                    modalButton("Close", icon = icon("eject", lib = "glyphicon")),
                 ),
                 easyClose = TRUE,
                 makeTagList(ns = session$ns, rv = rv, inputwidth = inputwidth)
