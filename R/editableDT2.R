@@ -79,9 +79,7 @@ editableDT <- function(input, output, session,
     defaultlen=20
 
     observe({
-
         updateTextInput(session,"result",value=dataname())
-
     })
 
     observe({
@@ -89,14 +87,14 @@ editableDT <- function(input, output, session,
     })
 
 
-    df=reactive({
-        if(is.null(input$result)){
-            df<-data()
-        } else if(input$result!="") {
-            df<-eval(parse(text=input$result))
+    df <- reactive({
+        if (is.null(input$result)){
+            df <- data()
+        } else {
+            if (input$result!="") {
+                df <- eval(parse(text=input$result))
+            } else { df <- data() }
         }
-        else df<-data()
-
         df
     })
 
@@ -448,16 +446,21 @@ editableDT <- function(input, output, session,
     })
 
     observeEvent(input$update,{
+        assign(x = "updatedx", value = updated, envir = .GlobalEnv)
+        assign(x = "updated1x", value = updated1, envir = .GlobalEnv)
+        message("input$result = ", input$result)
+
         ids <- input$no
         message("ids = ", ids)
         message("dim(df()) = ", paste(dim(df()), collapse = ","))
-        x<-df()
+        x <- df()
+
         #assign(x = "xx", value = x, envir = .GlobalEnv)
         restored<<-x
 
         myname=colnames(x)
         status=ifelse(tibble::has_rownames(x),1,0)
-        x<-as.data.frame(x)
+        x <- as.data.frame(x)
         message("input$rowname = ", input$rowname)
         rownames(x)[ids]=input$rowname
 

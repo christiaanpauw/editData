@@ -150,7 +150,7 @@ numericInput3<-function (inputId, label, value, min=NA,max=NA,step=NA,width=100,
 #'   }
 #'   shinyApp(ui, server)
 #'}
-checkboxInput3<-function(inputId,label,value=FALSE,width=100){
+checkboxInput3 <- function(inputId,label,value=FALSE,width=100){
   if(value)
     div(style="display:inline-block;",
 
