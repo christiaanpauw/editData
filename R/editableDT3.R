@@ -1,4 +1,4 @@
-#' UI of editData Shiny module
+#' UI of abEditData Shiny module
 #' @param id A string
 #' @importFrom shiny NS icon fluidPage fluidRow actionButton p conditionalPanel numericInput textInput
 #' @importFrom DT dataTableOutput
@@ -10,19 +10,19 @@ editableDT3UI <- function(id, mode = c(1:4)[4]){
     fluidPage(
         fluidRow(
             shinyjs::useShinyjs(),
-            if(mode %in% c(1,2,3)) actionButton(ns("delRow"),"Delete Row",icon=icon("remove",lib="glyphicon")),
-            if(mode %in% c(1,2,3,4)) actionButton(ns("editData"),"Edit Data",icon=icon("wrench",lib="glyphicon")),
-            if(mode %in% c(1,3)) actionButton(ns("newCol"),"New Col",icon=icon("plus-sign",lib="glyphicon")),
-            if(mode %in% c(1,3)) actionButton(ns("removeCol"),"Remove Col",icon=icon("trash",lib="glyphicon")),
-            if(mode %in% c(2,3)) actionButton(ns("reset"),"Reset",icon=icon("remove-sign",lib="glyphicon")),
-            if(mode %in% c(2,3)) actionButton(ns("restore"),"Restore",icon=icon("heart",lib="glyphicon")),
+            if(mode %in% c(1,2,3)) actionButton(ns("abDelRow"),"Delete Row",icon=icon("remove",lib="glyphicon")),
+            if(mode %in% c(1,2,3,4)) actionButton(ns("abEditData"),"Edit Data",icon=icon("wrench",lib="glyphicon")),
+            if(mode %in% c(1,3)) actionButton(ns("abNewCol"),"New Col",icon=icon("plus-sign",lib="glyphicon")),
+            if(mode %in% c(1,3)) actionButton(ns("abRemoveCol"),"Remove Col",icon=icon("trash",lib="glyphicon")),
+            if(mode %in% c(2,3)) actionButton(ns("abReset"),"Reset",icon=icon("remove-sign",lib="glyphicon")),
+            if(mode %in% c(2,3)) actionButton(ns("abRestore"),"Restore",icon=icon("heart",lib="glyphicon")),
             p(""),
             DT::DTOutput(ns("origTable"))
         )
     )
 }
 
-#' Server function of editData Shiny module
+#' Server function of abEditData Shiny module
 #'
 #' @param input input
 #' @param output output
@@ -30,17 +30,20 @@ editableDT3UI <- function(id, mode = c(1:4)[4]){
 #' @param data A data object
 #' @param inputwidth Numeric indicating default input width in pixel
 #' @param mode An integer
+#' @param excludeCols Character A vector of column names in data to hide from the user
+#' @param editableRowNames Logical If TRUE, user will be allowed to edit row names of data.
 #' @importFrom shiny updateTextInput updateNumericInput reactive validate need showModal modalDialog updateDateInput updateCheckboxInput updateSelectInput observe modalButton renderUI textAreaInput updateTextAreaInput removeModal
 #' @importFrom DT renderDataTable datatable dataTableProxy replaceData selectPage
 #' @importFrom dplyr select
 #' @importFrom magrittr "%>%"
 #' @export
 editableDT3 <- function(input, output, session,
-                       data = reactive(NULL),
-                       inputwidth = reactive(100),
-                       mode = reactive(2),
-                       excludeCols = c(),
-                       defaultlen = 20) {
+                        data = reactive(NULL),
+                        inputwidth = reactive(100),
+                        mode = reactive(2),
+                        excludeCols = c(),
+                        editableRowNames = FALSE,
+                        defaultlen = 20) {
 
 
     rv <- reactiveValues()
@@ -70,10 +73,10 @@ editableDT3 <- function(input, output, session,
 
     observeEvent(input$origTable_cell_edit, {
 
-        info = input$origTable_cell_edit
-        i = info$row
-        j = info$col
-        v = info$value
+        info <- input$origTable_cell_edit
+        i <- info$row
+        j <- info$col
+        v <- info$value
         x <- rv$dataInternal
         x[i, j] <- DT::coerceValue(v, x[i, j])
         replaceData(proxy, x, resetPaging = FALSE)  # important
@@ -82,7 +85,7 @@ editableDT3 <- function(input, output, session,
         rv$page <- (i-1) %/% 10+1
     })
 
-    observeEvent(input$delRow,{
+    observeEvent(input$abDelRow, {
         ids <- input$origTable_rows_selected
 
         if (length(ids) == 0) {
@@ -103,7 +106,7 @@ editableDT3 <- function(input, output, session,
         rv$page <- (ids[1]-1) %/% 10+1
     })
 
-    observeEvent(input$editData,{
+    observeEvent(input$abEditData, {
 
         ids <- input$origTable_rows_selected
 
@@ -131,7 +134,7 @@ editableDT3 <- function(input, output, session,
         rv$page <- (ids-1) %/% 10+1
     })
 
-    observeEvent(input$newCol,{
+    observeEvent(input$abNewCol,{
 
         ns <- session$ns
 
@@ -164,21 +167,21 @@ editableDT3 <- function(input, output, session,
         removeModal()
     })
 
-    observeEvent(input$removeCol,{
+    observeEvent(input$abRemoveCol,{
 
         ns <- session$ns
 
         showModal(
             modalDialog(
-            title = "Delete Column",
-            "Please select column(s) to delete.",
-            selectInput(ns("colRemove"), "Column to Remove", choices = colnames(rv$dataInternal)),
-            easyClose = TRUE,
-            footer=tagList(
-                modalButton("Cancel"),
-                actionButton(ns("delCol"),"Remove")
-            )
-        ))
+                title = "Delete Column",
+                "Please select column(s) to delete.",
+                selectInput(ns("colRemove"), "Column to Remove", choices = colnames(rv$dataInternal)),
+                easyClose = TRUE,
+                footer=tagList(
+                    modalButton("Cancel"),
+                    actionButton(ns("delCol"),"Remove")
+                )
+            ))
 
     })
 
@@ -191,11 +194,11 @@ editableDT3 <- function(input, output, session,
 
     })
 
-    observeEvent(input$reset,{
+    observeEvent(input$abReset,{
         rv$dataInternal <- data()
     })
 
-    observeEvent(input$restore,{
+    observeEvent(input$abRestore,{
         rv$dataInternal <- data()
     })
 
@@ -217,17 +220,22 @@ editableDT3 <- function(input, output, session,
             modalDialog(
                 title = "Edit Data",
                 footer = tagList(
-                    actionButton(inputId = ns("remove"), label = "Delete", icon = icon("remove", lib = "glyphicon")),
-                    actionButton(inputId = ns("update"), label = "Update", icon = icon("ok", lib = "glyphicon")),
+                    actionButton(inputId = ns("abRemove"), label = "Delete", icon = icon("remove", lib = "glyphicon")),
+                    actionButton(inputId = ns("abUpdate"), label = "Update", icon = icon("ok", lib = "glyphicon")),
                     modalButton("Close", icon = icon("eject", lib = "glyphicon")),
                 ),
                 easyClose = TRUE,
-                makeTagList(ns = session$ns, rv = rv, inputwidth = inputwidth)
+                makeTagList(ns = session$ns,
+                            rv = rv,
+                            inputwidth = inputwidth,
+                            defaultlen = defaultlen,
+                            editableRowNames = editableRowNames,
+                            excludeCols = excludeCols)
             )
         )
     })
 
-    observeEvent(rv$no, {
+    observeEvent(c(rv$no, rv$dataInternal), {
 
         if (length(rv$dataInternal) == 0) { return(invisible(NULL)) }
 
@@ -235,7 +243,9 @@ editableDT3 <- function(input, output, session,
         myclass <- lapply(mydf2, class)
 
         updateNumericInput(session = session, inputId = "rowno", value = rv$no)
-        updateTextInput(session, "rowname", value = rownames(mydf2)[rv$no])
+        if (editableRowNames) {
+            updateTextInput(session, "rowname", value = rownames(mydf2)[rv$no])
+        }
 
         mydf <- as.data.frame(mydf2[rv$no,])
 
@@ -265,16 +275,18 @@ editableDT3 <- function(input, output, session,
         }
     })
 
-    observeEvent(input$remove,{
+    observeEvent(input$abRemove,{
 
         x <- as.data.frame(rv$dataInternal)
         x <- x[-rv$no,]
         rv$dataInternal <- x
 
         if (rv$no > nrow(x)) { rv$no <- nrow(x) }
+
+        # the editModal should be updated as well
     })
 
-    observeEvent(input$update,{
+    observeEvent(input$abUpdate,{
 
         ids <- rv$no
         if (length(ids) == 0) { return(invisible(NULL)) }
@@ -283,11 +295,13 @@ editableDT3 <- function(input, output, session,
         x <- as.data.frame(rv$dataInternal)
 
         # update rowname
-        tryCatch({
-            rownames(x)[ids] <- input$rowname
-        }, error = function(e) {
-            message("Failed to update rowname. %s", e)
-        })
+        if (editableRowNames) {
+            tryCatch({
+                rownames(x)[ids] <- input$rowname
+            }, error = function(e) {
+                message("Failed to update rowname. %s", e)
+            })
+        }
 
         # update values
         myname <- colnames(x)
@@ -352,7 +366,7 @@ editableDT3 <- function(input, output, session,
 
 #'@title makeTagList
 #'@export
-makeTagList <- function(ns, rv, inputwidth) {
+makeTagList <- function(ns, rv, inputwidth, defaultlen, editableRowNames = FALSE, excludeCols = c()) {
 
     mydf2 <- rv$dataInternal
     myclass <- lapply(mydf2, FUN = function(x) {
@@ -372,9 +386,13 @@ makeTagList <- function(ns, rv, inputwidth) {
                       max = nrow(rv$dataInternal), step = 1, width = 50+10*log10(nrow(rv$dataInternal))),
         actionButton(inputId = ns("right"), label = "", icon = icon("chevron-right", lib = "glyphicon")),
         actionButton(inputId = ns("end"), label = "", icon = icon("forward", lib = "glyphicon")),
-        actionButton(inputId = ns("new"), label = "", icon = icon("plus", lib = "glyphicon")),
-        textInput3(inputId = ns("rowname"), label = "rowname", value = rownames(rv$dataInternal)[rv$no], width = 150)
+        actionButton(inputId = ns("new"), label = "", icon = icon("plus", lib = "glyphicon"))
     )
+    if (editableRowNames) {
+        mylist[[length(mylist)+1]] <- textInput3(inputId = ns("rowname"), label = "rowname",
+                                                 value = rownames(rv$dataInternal)[rv$no],
+                                                 width = 150)
+    }
     mylist[[length(mylist)+1]] <- hr()
 
     addno <- length(mylist)
@@ -382,6 +400,7 @@ makeTagList <- function(ns, rv, inputwidth) {
 
     for (i in 1:ncol(mydf)){
         myname <- colnames(mydf)[i]
+        if (myname %in% excludeCols) { next }
         if ("factor" %in% myclass[[i]]) {
             mylist[[i+addno]] <- selectInput3(inputId = ns(myname), label = myname, choices = levels(mydf[[i]]),
                                               selected = mydf[1,i], width=inputwidth())

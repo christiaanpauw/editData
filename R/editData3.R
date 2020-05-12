@@ -35,15 +35,21 @@ editData3 <- function(data = NULL, viewer = c("dialog", "browser", "pane")[1], m
 
                 observeEvent(input$file1, {
                         if (!is.null(input$file1)) {
-                                dfInput(read.csv(input$file1$datapath, stringsAsFactors = input$strAsFactor))
+                                dfInput(read.csv(input$file1$datapath,
+                                                 stringsAsFactors = input$strAsFactor))
                         }
                 })
 
-                dfOutput <- callModule(editableDT3, "table1", data = dfInput, inputwidth = reactive(170), mode = reactive(mode))
+                dfOutput <- callModule(editableDT3, "table1",
+                                       data = dfInput,
+                                       inputwidth = reactive(170),
+                                       mode = reactive(mode),
+                                       editableRowNames = TRUE,
+                                       excludeCols = c("mpg"))
 
                 output$downloadData <- downloadHandler(
                         filename = function() {
-                                paste("edited-",Sys.Date(),".csv", sep = "")
+                                paste("edited-", Sys.Date(), ".csv", sep = "")
                         },
                         content = function(file) {
                                 write.csv(dfOutput(), file, row.names = FALSE)
